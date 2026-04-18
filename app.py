@@ -363,136 +363,6 @@ tbody td{
 .pv-tbl tfoot td.num{color:var(--ac)}
 .pv-tbl tfoot td.muted{color:var(--mu);font-weight:500}
 
-/* ── Pivot DP Cell — clickable ── */
-.pv-tbl tbody td.dp-cell{
-  cursor:pointer;
-  transition:background .15s,color .15s;
-  position:relative;
-}
-.pv-tbl tbody td.dp-cell::after{
-  content:'›';
-  position:absolute;right:10px;top:50%;transform:translateY(-50%);
-  font-size:.9rem;color:var(--mu);transition:color .15s,right .15s;
-}
-.pv-tbl tbody td.dp-cell:hover{background:var(--ac-lt)!important;color:var(--ac);}
-.pv-tbl tbody td.dp-cell:hover::after{color:var(--ac);right:7px}
-.pv-tbl tbody tr.pv-selected td{background:var(--ac-lter)!important;}
-.pv-tbl tbody tr.pv-selected td.dp-cell{
-  background:var(--ac-lt)!important;color:var(--ac);font-weight:800;
-}
-.pv-tbl tbody tr.pv-selected td.dp-cell::after{content:'✕';color:var(--ac);right:8px}
-
-/* ── Rekap Section ── */
-.rekap-empty{
-  text-align:center;padding:52px 24px;
-  border:2px dashed var(--border2);
-  border-radius:var(--radius);
-  color:var(--mu);
-}
-.rekap-empty .re-ico{font-size:3rem;display:block;margin-bottom:14px;opacity:.6}
-.rekap-empty p{font-size:.95rem;font-weight:500;margin-bottom:6px}
-.rekap-empty small{font-size:.82rem}
-
-.rekap-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:20px;padding-bottom:14px;
-  border-bottom:2px solid var(--border);
-}
-.rekap-title{
-  display:flex;align-items:center;gap:10px;
-}
-.rekap-title h2{font-size:1.3rem;font-weight:800;color:var(--ac);letter-spacing:-.02em}
-.rekap-title .rt-badge{
-  background:var(--ac-lt);border:1px solid rgba(79,70,229,.2);
-  color:var(--ac);font-size:.75rem;font-weight:700;
-  padding:3px 10px;border-radius:20px;
-}
-.btn-reset{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--surface2);border:1px solid var(--border2);
-  color:var(--tx2);padding:8px 16px;border-radius:var(--radius-sm);
-  font-size:.83rem;cursor:pointer;font-weight:600;
-  transition:all .18s;font-family:inherit;
-}
-.btn-reset:hover{background:var(--er-bg);border-color:rgba(220,38,38,.3);color:var(--er)}
-
-/* ── Markdown Content ── */
-.md-body{line-height:1.7;color:var(--tx)}
-.md-body h3{
-  font-size:1rem;font-weight:700;color:var(--tx2);
-  margin:22px 0 10px;display:flex;align-items:center;gap:8px;
-  text-transform:uppercase;letter-spacing:.05em;font-size:.78rem;
-}
-.md-body h3 .h3-badge{
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--mu);font-size:.72rem;padding:2px 8px;border-radius:20px;
-  text-transform:none;letter-spacing:0;font-weight:500;
-}
-.md-sumber{
-  background:linear-gradient(135deg,var(--surface2),#eef2ff);
-  border:1px solid var(--border);border-left:4px solid var(--ac);
-  border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:16px;
-}
-.md-sumber-title{
-  font-size:.88rem;font-weight:800;color:var(--ac);
-  text-transform:uppercase;letter-spacing:.06em;
-  margin-bottom:14px;display:flex;align-items:center;gap:8px;
-}
-.md-status-block{margin-bottom:14px}
-.md-status-block:last-child{margin-bottom:0}
-.md-status-label{
-  font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
-  color:var(--tx2);margin-bottom:8px;display:flex;align-items:center;gap:8px;
-}
-.md-status-label .cnt{
-  background:var(--ac);color:#fff;
-  font-size:.68rem;padding:1px 7px;border-radius:20px;font-weight:700;
-}
-.md-status-label.dispatch .cnt{background:var(--ok)}
-.md-status-label.pusat .cnt{background:var(--wn)}
-.md-awb-list{
-  display:flex;flex-direction:column;gap:5px;
-}
-.md-awb-item{
-  display:flex;align-items:center;gap:10px;
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius-xs);padding:7px 12px;
-  font-size:.82rem;
-}
-.md-awb-num{
-  font-family:'JetBrains Mono',monospace;font-weight:600;
-  color:var(--tx);flex:1;
-}
-.md-sprinter{
-  font-size:.78rem;color:var(--tx2);font-weight:500;
-  background:var(--surface2);border:1px solid var(--border);
-  padding:2px 8px;border-radius:4px;
-}
-.md-empty-sumber{
-  font-size:.82rem;color:var(--mu);font-style:italic;padding:8px 0;
-}
-.md-no-data{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--radius-xs);padding:14px;
-  text-align:center;color:var(--mu);font-size:.85rem;
-}
-
-/* ── Rekap Copy Bar ── */
-.rekap-copy-bar{
-  margin-top:20px;padding-top:14px;border-top:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;
-}
-.btn-copy-md{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--ac-lt);border:1px solid rgba(79,70,229,.2);
-  color:var(--ac);padding:9px 18px;border-radius:var(--radius-sm);
-  font-size:.85rem;cursor:pointer;font-weight:700;
-  transition:all .18s;font-family:inherit;
-}
-.btn-copy-md:hover{background:var(--ac);color:#fff}
-.btn-copy-md.copied{background:var(--ok-bg);border-color:rgba(5,150,105,.3);color:var(--ok)}
-.copy-hint{font-size:.78rem;color:var(--mu)}
-
 /* ── Responsive ── */
 @media(max-width:600px){
   .hdr h1{font-size:1.7rem}
@@ -509,7 +379,7 @@ tbody td{
   <div class="hdr-badge">📊 Excel Explorer</div>
   <h1>Filter & Analisis Excel</h1>
   <p>Upload file .xlsx → Filter otomatis → Export ke CSV</p>
-  <p>18/04/2026 11:43</p>
+  <p>18/04/2026 10:41</p>
 </div>
 
 <div class="notice">
@@ -570,24 +440,16 @@ tbody td{
 
 <div class="card" id="pv-sec" style="display:none">
   <div class="card-title"><span class="ic">📊</span> Pivot: DP Terjadwal × Status Orderan</div>
-  <p style="color:var(--mu);font-size:.85rem;margin-bottom:16px">
-    Jumlah AWB per DP berdasarkan status pengiriman —
-    <strong style="color:var(--ac)">klik nama DP</strong> untuk melihat rekap detail
-  </p>
+  <p style="color:var(--mu);font-size:.85rem;margin-bottom:16px">Jumlah AWB per DP berdasarkan status pengiriman</p>
   <div class="pv-wrap">
     <table class="pv-tbl" id="pv-tbl"></table>
   </div>
 </div>
 
-<div class="card" id="dp-sec">
+<div class="card" id="dp-sec" style="display:none">
   <div class="card-title"><span class="ic">📋</span> Rekap per DP Terjadwal</div>
-  <div id="rekap-content">
-    <div class="rekap-empty">
-      <span class="re-ico">📍</span>
-      <p>Belum ada DP yang dipilih</p>
-      <small>Klik nama <strong>DP Terjadwal</strong> pada tabel pivot di atas untuk menampilkan rekap detail</small>
-    </div>
-  </div>
+  <p style="color:var(--mu);font-size:.85rem;margin-bottom:8px">Setiap kartu mewakili satu nilai <strong>DP Terjadwal</strong> — klik tombol untuk menyalin isi textarea</p>
+  <div class="dp-grid" id="dp-cards"></div>
 </div>
 
 </div>
@@ -626,10 +488,10 @@ tbody td{
     document.getElementById('ld').style.display='block';
     document.getElementById('res').style.display='none';
     document.getElementById('pv-sec').style.display='none';
+    document.getElementById('dp-sec').style.display='none';
     document.getElementById('er').innerHTML='';
     document.getElementById('pvBody').classList.add('closed');
     document.getElementById('pvArrow').classList.remove('open');
-    resetRekap(true);
     var fd=new FormData();
     fd.append('file',file);
     fetch('/api/upload',{method:'POST',body:fd})
@@ -710,6 +572,7 @@ tbody td{
 
     document.getElementById('res').style.display='block';
     document.getElementById('res').scrollIntoView({behavior:'smooth'});
+    fetchDpCards();
     fetchPivot();
   }
 
@@ -773,9 +636,7 @@ tbody td{
         }).join('');
       }).join('');
       var gt=row.grand_total;
-      return '<tr data-dp="'+esc(row.dp)+'">'
-        +'<td class="dp-cell" title="Klik untuk lihat rekap '+esc(row.dp)+'">'+esc(row.dp)+'</td>'
-        +cells
+      return '<tr><td>'+esc(row.dp)+'</td>'+cells
         +'<td class="num">'+Number(gt).toLocaleString('id-ID')+'</td></tr>';
     }).join('')+'</tbody>';
 
@@ -799,146 +660,55 @@ tbody td{
 
     tbl.innerHTML=th+tb+gf;
     sec.style.display='block';
-
-    // ── Pivot row click: toggle rekap ──
-    tbl.addEventListener('click',function(e){
-      var cell=e.target.closest('.dp-cell');
-      if(!cell)return;
-      var row=cell.closest('tr');
-      var dp=row.getAttribute('data-dp');
-      if(!dp)return;
-      var isSelected=row.classList.contains('pv-selected');
-      // deselect all rows
-      tbl.querySelectorAll('tr.pv-selected').forEach(function(r){r.classList.remove('pv-selected');});
-      if(isSelected){
-        resetRekap(false);
-      }else{
-        row.classList.add('pv-selected');
-        fetchRekapForDp(dp);
-        document.getElementById('dp-sec').scrollIntoView({behavior:'smooth',block:'start'});
-      }
-    });
   }
 
-  var _selectedDp=null;
-
-  function resetRekap(silent){
-    _selectedDp=null;
-    document.getElementById('rekap-content').innerHTML=
-      '<div class="rekap-empty">'
-      +'<span class="re-ico">📍</span>'
-      +'<p>Belum ada DP yang dipilih</p>'
-      +'<small>Klik nama <strong>DP Terjadwal</strong> pada tabel pivot di atas untuk menampilkan rekap detail</small>'
-      +'</div>';
-  }
-
-  function fetchRekapForDp(dp){
-    _selectedDp=dp;
-    var rc=document.getElementById('rekap-content');
-    rc.innerHTML='<div class="loading" style="padding:40px 0"><div class="spinner"></div><p>Memuat rekap '+esc(dp)+'…</p></div>';
-    fetch('/api/rekap?dp='+encodeURIComponent(dp))
+  function fetchDpCards(){
+    fetch('/api/textboxdata')
       .then(function(r){return r.json();})
-      .then(function(d){
-        if(_selectedDp!==dp)return; // user switched before response
-        if(d.error){rc.innerHTML='<div class="err-box">⚠️ '+esc(d.error)+'</div>';return;}
-        renderRekapMd(d);
-      })
-      .catch(function(e){rc.innerHTML='<div class="err-box">⚠️ Gagal memuat: '+esc(e.message)+'</div>';});
+      .then(function(d){if(!d.error)renderDpCards(d.cards);})
+      .catch(function(){});
   }
 
-  function renderRekapMd(d){
-    var dp=d.dp;
-    var sections=d.sections||[];
-    var totalAwb=0;
-    sections.forEach(function(s){s.statuses.forEach(function(st){totalAwb+=st.items.length;});});
+  function renderDpCards(cards){
+    var sec=document.getElementById('dp-sec');
+    var grid=document.getElementById('dp-cards');
+    if(!cards||!cards.length){return;}
+    grid.innerHTML=cards.map(function(c,i){
+      var badge=c.has_content
+        ?'<span class="dp-badge">✔ Ada data</span>'
+        :'<span class="dp-badge mt">Kosong</span>';
+      return '<div class="dp-card">'
+        +'<div class="dp-card-hdr">'
+        +'<span class="dp-title">📍 '+esc(c.dp)+'</span>'
+        +badge
+        +'</div>'
+        +'<textarea class="dp-ta" id="dpta'+i+'" readonly>'+esc(c.content)+'</textarea>'
+        +'<button class="btn-copy" data-idx="'+i+'">📋 Salin Teks</button>'
+        +'</div>';
+    }).join('');
 
-    var statusIcon={'DISPATCH':'📦','PUSAT_DISPATCH':'🏢'};
-    var statusColor={'DISPATCH':'dispatch','PUSAT_DISPATCH':'pusat'};
-
-    var bodyHtml='';
-
-    if(!sections.length){
-      bodyHtml='<div class="md-no-data">Tidak ada data AWB (DISPATCH / PUSAT_DISPATCH) untuk DP ini</div>';
-    }else{
-      bodyHtml=sections.map(function(sec){
-        var stHtml=sec.statuses.map(function(st){
-          var ico=statusIcon[st.status]||'📋';
-          var cls=statusColor[st.status]||'';
-          var cnt=st.items.length;
-          var itemsHtml=st.items.map(function(item,idx){
-            return '<div class="md-awb-item">'
-              +'<span class="md-awb-num">'+(idx+1)+'.&nbsp;&nbsp;'+esc(item.awb)+'</span>'
-              +(item.sprinter?'<span class="md-sprinter">'+esc(item.sprinter)+'</span>':'')
-              +'</div>';
-          }).join('');
-          return '<div class="md-status-block">'
-            +'<div class="md-status-label '+cls+'">'+ico+' '+esc(st.status)+' <span class="cnt">'+cnt+' AWB</span></div>'
-            +'<div class="md-awb-list">'+itemsHtml+'</div>'
-            +'</div>';
-        }).join('');
-        return '<div class="md-sumber">'
-          +'<div class="md-sumber-title">🔄 '+esc(sec.sumber)+'</div>'
-          +stHtml
-          +'</div>';
-      }).join('');
-    }
-
-    // Build plain-text untuk copy
-    var plainLines=['📍 '+dp,''];
-    sections.forEach(function(sec){
-      plainLines.push('== '+sec.sumber+' ==');
-      plainLines.push('');
-      sec.statuses.forEach(function(st){
-        plainLines.push('--- '+st.status+' ('+st.items.length+' AWB) ---');
-        st.items.forEach(function(item,idx){
-          plainLines.push((idx+1)+'. '+item.awb+(item.sprinter?' ['+item.sprinter+']':''));
-        });
-        plainLines.push('');
-      });
-    });
-    var plainText=plainLines.join('\n').trim();
-
-    var html='<div class="rekap-header">'
-      +'<div class="rekap-title">'
-      +'<h2>📍 '+esc(dp)+'</h2>'
-      +'<span class="rt-badge">'+totalAwb+' AWB</span>'
-      +'</div>'
-      +'<button class="btn-reset" id="rekapResetBtn">✕ Tutup</button>'
-      +'</div>'
-      +'<div class="md-body">'+bodyHtml+'</div>'
-      +'<div class="rekap-copy-bar">'
-      +'<button class="btn-copy-md" id="rekapCopyBtn">📋 Salin Rekap</button>'
-      +'<span class="copy-hint">Salin sebagai teks terformat</span>'
-      +'</div>';
-
-    document.getElementById('rekap-content').innerHTML=html;
-
-    document.getElementById('rekapResetBtn').addEventListener('click',function(){
-      // juga deselect pivot row
-      var pvTbl=document.getElementById('pv-tbl');
-      if(pvTbl)pvTbl.querySelectorAll('tr.pv-selected').forEach(function(r){r.classList.remove('pv-selected');});
-      resetRekap(false);
-    });
-
-    document.getElementById('rekapCopyBtn').addEventListener('click',function(){
-      var btn=this;
+    grid.addEventListener('click',function(e){
+      var btn=e.target.closest('.btn-copy');
+      if(!btn)return;
+      var idx=btn.getAttribute('data-idx');
+      var ta=document.getElementById('dpta'+idx);
+      if(!ta)return;
+      ta.select();ta.setSelectionRange(0,99999);
       var ok=function(){
         btn.innerHTML='✅ Tersalin!';btn.classList.add('copied');
-        setTimeout(function(){btn.innerHTML='📋 Salin Rekap';btn.classList.remove('copied');},2200);
+        setTimeout(function(){btn.innerHTML='📋 Salin Teks';btn.classList.remove('copied');},2000);
       };
       if(navigator.clipboard&&window.isSecureContext){
-        navigator.clipboard.writeText(plainText).then(ok).catch(function(){ok();});
+        navigator.clipboard.writeText(ta.value).then(ok).catch(function(){
+          try{document.execCommand('copy');}catch(ex){}ok();
+        });
       }else{
-        var ta=document.createElement('textarea');
-        ta.value=plainText;ta.style.position='fixed';ta.style.opacity='0';
-        document.body.appendChild(ta);ta.select();
-        try{document.execCommand('copy');}catch(ex){}
-        document.body.removeChild(ta);ok();
+        try{document.execCommand('copy');}catch(ex){}ok();
       }
     });
-  }
 
-  function fetchDpCards(){}
+    sec.style.display='block';
+  }
 
 })();
 </script>
@@ -1085,63 +855,6 @@ def upload():
 
     except Exception as e:
         return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
-
-
-@app.route('/api/rekap')
-def rekap():
-    dp_val = request.args.get('dp', '').strip()
-    if not dp_val:
-        return jsonify({'error': 'Parameter dp diperlukan'}), 400
-
-    df = store['df_proc']
-    if df is None:
-        return jsonify({'error': 'Belum ada data yang diproses'}), 400
-
-    col_dp       = find_col(df, 'DP Terjadwal')
-    col_sumber   = find_col(df, 'Sumber Order')
-    col_status   = find_col(df, 'Status Orderan')
-    col_awb      = find_col(df, 'Nomor AWB')
-    col_sprinter = find_col(df, 'Sprinter')
-
-    if not col_dp:
-        return jsonify({'error': "Kolom 'DP Terjadwal' tidak ditemukan"}), 400
-
-    VALID_SUMBER = ['TTREVERSE', 'TOKOREVERSE']
-    VALID_STATUS = ['DISPATCH', 'PUSAT_DISPATCH']
-
-    df_dp = df[df[col_dp].astype(str).str.strip() == dp_val]
-
-    sections = []
-    for sumber_val in VALID_SUMBER:
-        if col_sumber is None:
-            break
-        df_s = df_dp[df_dp[col_sumber].astype(str).str.strip().str.upper() == sumber_val]
-        if df_s.empty:
-            continue
-
-        sumber_data = {'sumber': sumber_val, 'statuses': []}
-
-        for status_val in VALID_STATUS:
-            if col_status is None:
-                break
-            df_st = df_s[df_s[col_status].astype(str).str.strip().str.upper() == status_val]
-            if df_st.empty:
-                continue
-
-            items = []
-            for _, row in df_st.iterrows():
-                awb      = str(row[col_awb]).strip() if col_awb and col_awb in row.index else ''
-                sprinter = ''
-                if status_val == 'DISPATCH' and col_sprinter and col_sprinter in row.index:
-                    sprinter = str(row[col_sprinter]).strip()
-                items.append({'awb': awb, 'sprinter': sprinter})
-
-            sumber_data['statuses'].append({'status': status_val, 'items': items, 'count': len(items)})
-
-        if sumber_data['statuses']:
-            sections.append(sumber_data)
-
-    return jsonify({'dp': dp_val, 'sections': sections})
 
 
 @app.route('/api/download')
