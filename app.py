@@ -379,7 +379,7 @@ tbody td{
   <div class="hdr-badge">📊 Excel Explorer</div>
   <h1>Filter & Analisis Excel</h1>
   <p>Upload file .xlsx → Filter otomatis → Export ke CSV</p>
-  <p>18/04/2026 10:41</p>
+  <p>18/04/2026 14:42</p>
 </div>
 
 <div class="notice">
@@ -492,6 +492,9 @@ tbody td{
     document.getElementById('er').innerHTML='';
     document.getElementById('pvBody').classList.add('closed');
     document.getElementById('pvArrow').classList.remove('open');
+    // Reset pivot & dp-cards agar tidak tampil data file sebelumnya
+    document.getElementById('pv-tbl').innerHTML='';
+    document.getElementById('dp-cards').innerHTML='';
     var fd=new FormData();
     fd.append('file',file);
     fetch('/api/upload',{method:'POST',body:fd})
@@ -576,11 +579,29 @@ tbody td{
     fetchPivot();
   }
 
-  function fetchPivot(){
+  function fetchPivot(attempt){
+    attempt = attempt || 1;
     fetch('/api/pivot')
-      .then(function(r){return r.json();})
-      .then(function(d){if(!d.error)renderPivot(d);})
-      .catch(function(){});
+      .then(function(r){
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        return r.json();
+      })
+      .then(function(d){
+        if(d.error){
+          console.warn('[Pivot] Error dari server:', d.error);
+          // Jika kolom tidak ditemukan, sembunyikan section saja
+          document.getElementById('pv-sec').style.display='none';
+          return;
+        }
+        renderPivot(d);
+      })
+      .catch(function(e){
+        console.warn('[Pivot] Gagal attempt '+attempt+':', e);
+        // Retry sampai 3x dengan jeda 600ms
+        if(attempt < 3){
+          setTimeout(function(){ fetchPivot(attempt+1); }, 600);
+        }
+      });
   }
 
   function renderPivot(d){
@@ -662,11 +683,26 @@ tbody td{
     sec.style.display='block';
   }
 
-  function fetchDpCards(){
+  function fetchDpCards(attempt){
+    attempt = attempt || 1;
     fetch('/api/textboxdata')
-      .then(function(r){return r.json();})
-      .then(function(d){if(!d.error)renderDpCards(d.cards);})
-      .catch(function(){});
+      .then(function(r){
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        return r.json();
+      })
+      .then(function(d){
+        if(d.error){
+          console.warn('[DpCards] Error:', d.error);
+          return;
+        }
+        renderDpCards(d.cards);
+      })
+      .catch(function(e){
+        console.warn('[DpCards] Gagal attempt '+attempt+':', e);
+        if(attempt < 3){
+          setTimeout(function(){ fetchDpCards(attempt+1); }, 600);
+        }
+      });
   }
 
   function renderDpCards(cards){
