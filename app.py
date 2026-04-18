@@ -448,7 +448,7 @@ tbody td{
   <div class="hdr-badge">📊 Excel Explorer</div>
   <h1>Filter & Analisis Excel</h1>
   <p>Upload file .xlsx → Filter otomatis → Export ke CSV</p>
-  <p>18/04/2026 11:09</p>
+  <p>18/04/2026 11:00</p>
 </div>
 
 <div class="notice">
@@ -543,33 +543,22 @@ tbody td{
 <script>
 (function(){
   var dz=document.getElementById('dz');
-  var fileInput=document.getElementById('fi');
+  var fi=document.getElementById('fi');
   var pickBtn=document.getElementById('pickBtn');
   var dlBtn=document.getElementById('dlBtn');
 
   // ── DP cards lookup (dp_value → markdown content) ──
   var dpLookup = {};
 
-  pickBtn.addEventListener('click',function(e){
-    e.stopPropagation();
-    fileInput.value='';   // reset supaya file yang sama bisa di-upload ulang
-    fileInput.click();
-  });
-  dz.addEventListener('click',function(e){
-    // Jika klik dari pickBtn (sudah punya handler sendiri), abaikan
-    if(e.target===pickBtn||pickBtn.contains(e.target)) return;
-    fileInput.value='';
-    fileInput.click();
-  });
+  pickBtn.addEventListener('click',function(e){e.stopPropagation();fi.click();});
+  dz.addEventListener('click',function(){fi.click();});
   dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over');});
   dz.addEventListener('dragleave',function(){dz.classList.remove('over');});
   dz.addEventListener('drop',function(e){
     e.preventDefault();dz.classList.remove('over');
     if(e.dataTransfer.files[0])handle(e.dataTransfer.files[0]);
   });
-  fileInput.addEventListener('change',function(){
-    if(fileInput.files[0])handle(fileInput.files[0]);
-  });
+  fi.addEventListener('change',function(){if(fi.files[0])handle(fi.files[0]);});
   dlBtn.addEventListener('click',function(){window.location.href='/api/download';});
 
   document.getElementById('pvHdr').addEventListener('click',function(){
@@ -695,21 +684,21 @@ tbody td{
   function fmt(n){return Number(n).toLocaleString('id-ID');}
 
   function render(d){
-    var info=d.file_info;
-    var sz=info.size_mb>=0.1?info.size_mb+' MB':info.size_kb+' KB';
+    var fi=d.file_info;
+    var sz=fi.size_mb>=0.1?fi.size_mb+' MB':fi.size_kb+' KB';
     var infoItems=[
-      {l:'Nama File',v:info.filename},
+      {l:'Nama File',v:fi.filename},
       {l:'Ukuran File',v:sz},
-      {l:'Total Baris',v:fmt(info.rows_total)},
-      {l:'Total Kolom',v:info.cols_total},
-      {l:'Memori (df)',v:info.memory_mb+' MB'}
+      {l:'Total Baris',v:fmt(fi.rows_total)},
+      {l:'Total Kolom',v:fi.cols_total},
+      {l:'Memori (df)',v:fi.memory_mb+' MB'}
     ];
     document.getElementById('fi-grid').innerHTML=infoItems.map(function(i){
       return '<div class="igi"><div class="igl">'+i.l+'</div><div class="igv">'+esc(String(i.v))+'</div></div>';
     }).join('');
 
-    document.getElementById('ccnt').textContent='('+info.cols_total+' kolom)';
-    document.getElementById('ctags').innerHTML=info.columns.map(function(c){
+    document.getElementById('ccnt').textContent='('+fi.cols_total+' kolom)';
+    document.getElementById('ctags').innerHTML=fi.columns.map(function(c){
       return '<span class="tag">'+esc(c)+'</span>';
     }).join('');
 
@@ -723,10 +712,10 @@ tbody td{
     }).join('');
 
     document.getElementById('srow').innerHTML=[
-      {n:fmt(info.rows_total),l:'Baris Awal'},
+      {n:fmt(fi.rows_total),l:'Baris Awal'},
       {n:fmt(d.rows_out),l:'Baris Hasil Filter'},
       {n:d.cols_out,l:'Kolom Digunakan'},
-      {n:fmt(info.rows_total-d.rows_out),l:'Baris Dihapus'}
+      {n:fmt(fi.rows_total-d.rows_out),l:'Baris Dihapus'}
     ].map(function(s){
       return '<div class="stat"><div class="stn">'+s.n+'</div><div class="stl">'+s.l+'</div></div>';
     }).join('');
