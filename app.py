@@ -363,75 +363,6 @@ tbody td{
 .pv-tbl tfoot td.num{color:var(--ac)}
 .pv-tbl tfoot td.muted{color:var(--mu);font-weight:500}
 
-
-/* ── Modal ── */
-.modal-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(15,20,50,.52);backdrop-filter:blur(4px);
-  z-index:1000;align-items:center;justify-content:center;padding:20px;
-}
-.modal-overlay.open{display:flex;}
-.modal-box{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:0 8px 56px rgba(79,70,229,.22),0 2px 12px rgba(0,0,0,.12);
-  max-width:530px;width:100%;
-  max-height:84vh;
-  display:flex;flex-direction:column;
-  animation:mfade .18s ease;
-}
-@keyframes mfade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.modal-hdr{
-  padding:15px 20px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
-}
-.modal-title{font-weight:800;font-size:.98rem;color:var(--ac);display:flex;align-items:center;gap:7px}
-.modal-close{
-  cursor:pointer;background:var(--surface2);
-  border:1px solid var(--border);border-radius:50%;
-  width:30px;height:30px;display:flex;align-items:center;justify-content:center;
-  font-size:.85rem;color:var(--mu);transition:all .15s;flex-shrink:0;
-}
-.modal-close:hover{background:var(--er-bg);color:var(--er);border-color:rgba(220,38,38,.3)}
-.modal-body{padding:18px 22px;overflow-y:auto;flex:1;min-height:0}
-.modal-footer{
-  padding:12px 20px;border-top:1px solid var(--border);
-  flex-shrink:0;
-}
-.modal-raw{display:none}
-/* Rendered markdown inside modal */
-.md-h1{
-  font-size:1rem;font-weight:800;color:var(--ac);
-  margin:16px 0 8px;padding-bottom:5px;
-  border-bottom:1.5px solid var(--border);
-}
-.md-h1:first-child{margin-top:0}
-.md-bold{
-  font-weight:700;font-size:.82rem;color:var(--tx);
-  margin:10px 0 4px;
-  background:var(--surface2);border:1px solid var(--border);
-  padding:3px 10px;border-radius:var(--radius-xs);
-  display:inline-block;letter-spacing:.04em;
-}
-.md-list{list-style:none;padding:0;margin:2px 0 8px 0}
-.md-list li{
-  font-family:'JetBrains Mono',monospace;font-size:.78rem;
-  color:var(--tx2);padding:2px 0 2px 20px;position:relative;
-  line-height:1.65;
-}
-.md-list li::before{content:'•';position:absolute;left:6px;color:var(--ac);font-size:1rem;line-height:1.4}
-/* Clickable pivot rows */
-.pv-tbl tbody tr.clickable{cursor:pointer}
-.pv-tbl tbody tr.clickable:hover td{background:var(--ac-lt)!important}
-.pv-tbl tbody tr.clickable td:first-child{
-  color:var(--ac);text-decoration:underline dotted 1.5px;
-  text-underline-offset:3px;
-}
-.pv-tbl tbody tr.clickable td:first-child::after{
-  content:' 🔍';font-size:.7rem;opacity:.6;
-}
-
 /* ── Responsive ── */
 @media(max-width:600px){
   .hdr h1{font-size:1.7rem}
@@ -448,7 +379,7 @@ tbody td{
   <div class="hdr-badge">📊 Excel Explorer</div>
   <h1>Filter & Analisis Excel</h1>
   <p>Upload file .xlsx → Filter otomatis → Export ke CSV</p>
-  <p>18/04/2026 11:00</p>
+  <p>18/04/2026 10:41</p>
 </div>
 
 <div class="notice">
@@ -509,7 +440,7 @@ tbody td{
 
 <div class="card" id="pv-sec" style="display:none">
   <div class="card-title"><span class="ic">📊</span> Pivot: DP Terjadwal × Status Orderan</div>
-  <p style="color:var(--mu);font-size:.85rem;margin-bottom:16px">Jumlah AWB per DP berdasarkan status pengiriman &nbsp;·&nbsp; <span style="color:var(--ac);font-weight:600">🔍 Klik baris DP untuk melihat Rekap DP Terjadwal</span></p>
+  <p style="color:var(--mu);font-size:.85rem;margin-bottom:16px">Jumlah AWB per DP berdasarkan status pengiriman</p>
   <div class="pv-wrap">
     <table class="pv-tbl" id="pv-tbl"></table>
   </div>
@@ -521,23 +452,6 @@ tbody td{
   <div class="dp-grid" id="dp-cards"></div>
 </div>
 
-<!-- Modal Rekap DP -->
-<div class="modal-overlay" id="dpModal">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <span class="modal-title" id="modalTitle">📍 —</span>
-      <button class="modal-close" id="modalClose" title="Tutup">✕</button>
-    </div>
-    <div class="modal-body">
-      <div id="modalRendered"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-copy" id="modalCopy" style="width:100%">📋 Salin Teks (Markdown)</button>
-      <textarea class="modal-raw" id="modalRaw" readonly></textarea>
-    </div>
-  </div>
-</div>
-
 </div>
 
 <script>
@@ -546,9 +460,6 @@ tbody td{
   var fi=document.getElementById('fi');
   var pickBtn=document.getElementById('pickBtn');
   var dlBtn=document.getElementById('dlBtn');
-
-  // ── DP cards lookup (dp_value → markdown content) ──
-  var dpLookup = {};
 
   pickBtn.addEventListener('click',function(e){e.stopPropagation();fi.click();});
   dz.addEventListener('click',function(){fi.click();});
@@ -568,77 +479,6 @@ tbody td{
     body.classList.toggle('closed',!closed);
     arrow.classList.toggle('open',closed);
   });
-
-  // ── Modal logic ──
-  var modal      = document.getElementById('dpModal');
-  var modalClose = document.getElementById('modalClose');
-  var modalCopy  = document.getElementById('modalCopy');
-  var modalRaw   = document.getElementById('modalRaw');
-
-  function openModal(dp, content){
-    document.getElementById('modalTitle').textContent = '📍 ' + dp;
-    document.getElementById('modalRendered').innerHTML = markdownToHtml(content);
-    modalRaw.value = content;
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeModal(){
-    modal.classList.remove('open');
-    document.body.style.overflow = '';
-    modalCopy.innerHTML = '📋 Salin Teks (Markdown)';
-    modalCopy.classList.remove('copied');
-  }
-  modalClose.addEventListener('click', closeModal);
-  modal.addEventListener('click', function(e){ if(e.target===modal) closeModal(); });
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
-
-  modalCopy.addEventListener('click', function(){
-    var text = modalRaw.value;
-    var ok = function(){
-      modalCopy.innerHTML = '✅ Tersalin!';
-      modalCopy.classList.add('copied');
-      setTimeout(function(){
-        modalCopy.innerHTML = '📋 Salin Teks (Markdown)';
-        modalCopy.classList.remove('copied');
-      }, 2200);
-    };
-    if(navigator.clipboard && window.isSecureContext){
-      navigator.clipboard.writeText(text).then(ok).catch(function(){
-        try{ modalRaw.select(); document.execCommand('copy'); }catch(ex){}
-        ok();
-      });
-    } else {
-      try{ modalRaw.select(); document.execCommand('copy'); }catch(ex){}
-      ok();
-    }
-  });
-
-  // ── Markdown → HTML renderer (subset: # h1, __bold__, * list) ──
-  function markdownToHtml(md){
-    var lines = md.split('\n');
-    var html  = '';
-    var inList = false;
-    for(var i=0; i<lines.length; i++){
-      var line = lines[i];
-      if(line.startsWith('# ')){
-        if(inList){ html += '</ul>'; inList = false; }
-        html += '<p class="md-h1">' + esc(line.slice(2)) + '</p>';
-      } else if(/^__.*__$/.test(line)){
-        if(inList){ html += '</ul>'; inList = false; }
-        html += '<span class="md-bold">' + esc(line.slice(2,-2)) + '</span>';
-      } else if(line.startsWith('* ')){
-        if(!inList){ html += '<ul class="md-list">'; inList = true; }
-        html += '<li>' + esc(line.slice(2)) + '</li>';
-      } else if(line.trim() === ''){
-        if(inList){ html += '</ul>'; inList = false; }
-      } else {
-        if(inList){ html += '</ul>'; inList = false; }
-        html += '<p style="font-size:.85rem;color:var(--tx2)">' + esc(line) + '</p>';
-      }
-    }
-    if(inList) html += '</ul>';
-    return html;
-  }
 
   function handle(file){
     if(!file.name.toLowerCase().endsWith('.xlsx')){
@@ -746,10 +586,11 @@ tbody td{
   function renderPivot(d){
     var sec=document.getElementById('pv-sec');
     var tbl=document.getElementById('pv-tbl');
-    var sbs=d.sumber_cols;
-    var sts=d.status_cols;
+    var sbs=d.sumber_cols;   // ['TTREVERSE','TOKOREVERSE']
+    var sts=d.status_cols;   // ['DISPATCH','PUSAT_DISPATCH']
+    var lastSb=sbs[sbs.length-1];
 
-    // ── Header Row 1 ──
+    // ── Header Row 1: grup Sumber Order ──
     var hdr1='<tr>'
       +'<th rowspan="2" style="vertical-align:bottom">'+esc(d.col_dp)+'</th>'
       +sbs.map(function(sb,i){
@@ -759,7 +600,7 @@ tbody td{
       +'<th rowspan="2" style="vertical-align:bottom">Grand Total</th>'
       +'</tr>';
 
-    // ── Header Row 2 ──
+    // ── Header Row 2: sub-kolom Status ──
     var hdr2='<tr>'
       +sbs.map(function(sb,i){
           return sts.map(function(st,j){
@@ -772,6 +613,7 @@ tbody td{
 
     var th='<thead>'+hdr1+hdr2+'</thead>';
 
+    // ── Body ──
     function cellVal(v){
       return (v===0||v===''||v===null)
         ? '<td class="muted">-</td>'
@@ -794,15 +636,11 @@ tbody td{
         }).join('');
       }).join('');
       var gt=row.grand_total;
-      var dpKey=row.dp;
-      var hasData=!!(dpLookup[dpKey]&&dpLookup[dpKey].has_content);
-      var rowCls=hasData?' class="clickable"':'';
-      var dataAttr=hasData?' data-dp="'+esc(dpKey)+'"':'';
-      return '<tr'+rowCls+dataAttr+'><td>'+esc(row.dp)+'</td>'+cells
+      return '<tr><td>'+esc(row.dp)+'</td>'+cells
         +'<td class="num">'+Number(gt).toLocaleString('id-ID')+'</td></tr>';
     }).join('')+'</tbody>';
 
-    // ── Footer ──
+    // ── Footer grand total ──
     var g=d.grand;
     var gf='<tfoot><tr><td>Grand Total</td>'
       +sbs.map(function(sb,i){
@@ -821,44 +659,55 @@ tbody td{
       +'</tr></tfoot>';
 
     tbl.innerHTML=th+tb+gf;
-
-    // ── Click handler on clickable rows ──
-    tbl.addEventListener('click', function(e){
-      var tr=e.target.closest('tr[data-dp]');
-      if(!tr) return;
-      var dp=tr.getAttribute('data-dp');
-      var card=dpLookup[dp];
-      if(card) openModal(card.dp, card.content);
-    });
-
     sec.style.display='block';
   }
 
   function fetchDpCards(){
     fetch('/api/textboxdata')
       .then(function(r){return r.json();})
-      .then(function(d){
-        if(!d.error) buildLookup(d.cards);
-      })
+      .then(function(d){if(!d.error)renderDpCards(d.cards);})
       .catch(function(){});
   }
 
-  // Build lookup dict and re-render pivot rows if pivot already drawn
-  function buildLookup(cards){
-    dpLookup = {};
-    if(!cards||!cards.length) return;
-    cards.forEach(function(c){ dpLookup[c.dp] = c; });
-    // Refresh clickable classes on pivot rows (pivot may render before lookup is ready)
-    var rows = document.querySelectorAll('#pv-tbl tbody tr[data-dp]');
-    rows.forEach(function(tr){
-      var dp = tr.getAttribute('data-dp');
-      if(dpLookup[dp] && dpLookup[dp].has_content){
-        tr.classList.add('clickable');
+  function renderDpCards(cards){
+    var sec=document.getElementById('dp-sec');
+    var grid=document.getElementById('dp-cards');
+    if(!cards||!cards.length){return;}
+    grid.innerHTML=cards.map(function(c,i){
+      var badge=c.has_content
+        ?'<span class="dp-badge">✔ Ada data</span>'
+        :'<span class="dp-badge mt">Kosong</span>';
+      return '<div class="dp-card">'
+        +'<div class="dp-card-hdr">'
+        +'<span class="dp-title">📍 '+esc(c.dp)+'</span>'
+        +badge
+        +'</div>'
+        +'<textarea class="dp-ta" id="dpta'+i+'" readonly>'+esc(c.content)+'</textarea>'
+        +'<button class="btn-copy" data-idx="'+i+'">📋 Salin Teks</button>'
+        +'</div>';
+    }).join('');
+
+    grid.addEventListener('click',function(e){
+      var btn=e.target.closest('.btn-copy');
+      if(!btn)return;
+      var idx=btn.getAttribute('data-idx');
+      var ta=document.getElementById('dpta'+idx);
+      if(!ta)return;
+      ta.select();ta.setSelectionRange(0,99999);
+      var ok=function(){
+        btn.innerHTML='✅ Tersalin!';btn.classList.add('copied');
+        setTimeout(function(){btn.innerHTML='📋 Salin Teks';btn.classList.remove('copied');},2000);
+      };
+      if(navigator.clipboard&&window.isSecureContext){
+        navigator.clipboard.writeText(ta.value).then(ok).catch(function(){
+          try{document.execCommand('copy');}catch(ex){}ok();
+        });
+      }else{
+        try{document.execCommand('copy');}catch(ex){}ok();
       }
     });
-    // Also patch rows that weren't marked yet (no data-dp means no content)
-    var allRows = document.querySelectorAll('#pv-tbl tbody tr:not([data-dp])');
-    // nothing to do for these — they have no content
+
+    sec.style.display='block';
   }
 
 })();
@@ -1034,17 +883,17 @@ def textboxdata():
     if not col_dp:
         return jsonify({'error': "Kolom 'DP Terjadwal' tidak ditemukan"}), 400
 
-    VALID_SUMBER  = ['TTREVERSE', 'TOKOREVERSE']
-    VALID_STATUS  = ['DISPATCH', 'PUSAT_DISPATCH']
-    SUMBER_DISPLAY = {
-        'TTREVERSE'  : 'TTREVERSE',
-        'TOKOREVERSE': 'TOKO REVERSE',
+    VALID_SUMBER = ['TTREVERSE', 'TOKOREVERSE']
+    VALID_STATUS = ['DISPATCH', 'PUSAT_DISPATCH']
+    custom = {
+        'DISPATCH':       {'top': TEXT_DISPATCH_TOP,  'bottom': TEXT_DISPATCH_BOTTOM},
+        'PUSAT_DISPATCH': {'top': TEXT_PUSAT_TOP,     'bottom': TEXT_PUSAT_BOTTOM},
     }
 
     cards = []
     for dp_val in df[col_dp].dropna().unique():
         df_dp = df[df[col_dp] == dp_val]
-        lines = [f'# {dp_val}']
+        lines = [str(dp_val), '']
         has_content = False
 
         for sumber_val in VALID_SUMBER:
@@ -1053,9 +902,8 @@ def textboxdata():
             df_s = df_dp[df_dp[col_sumber].astype(str).str.strip().str.upper() == sumber_val]
             if df_s.empty:
                 continue
-
-            sumber_lines = []
-            sumber_has   = False
+            slines = [sumber_val, '']
+            slines_ok = False
 
             for status_val in VALID_STATUS:
                 if col_status is None:
@@ -1063,25 +911,27 @@ def textboxdata():
                 df_st = df_s[df_s[col_status].astype(str).str.strip().str.upper() == status_val]
                 if df_st.empty:
                     continue
-
-                sumber_lines.append(f'__{status_val}__')
+                slines.append(status_val)
+                top = custom[status_val]['top']
+                if top:
+                    slines.append(top)
                 for _, row in df_st.iterrows():
                     awb = str(row[col_awb]).strip() if col_awb and col_awb in row.index else ''
                     if status_val == 'DISPATCH' and col_sprinter and col_sprinter in row.index:
                         sp = str(row[col_sprinter]).strip()
-                        sumber_lines.append(f'* {awb} [{sp}]')
+                        slines.append(f'{awb} [{sp}]')
                     else:
-                        sumber_lines.append(f'* {awb}')
-                sumber_lines.append('')
-                sumber_has = True
+                        slines.append(awb)
+                bot = custom[status_val]['bottom']
+                if bot:
+                    slines.append(bot)
+                slines.append('')
+                slines_ok = True
 
-            if sumber_has:
-                lines.append('')
-                lines.append(f'# {SUMBER_DISPLAY[sumber_val]}')
-                lines.extend(sumber_lines)
+            if slines_ok:
+                lines.extend(slines)
                 has_content = True
 
-        # Strip trailing empty lines
         while lines and lines[-1] == '':
             lines.pop()
 
