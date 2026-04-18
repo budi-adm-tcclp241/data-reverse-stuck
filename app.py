@@ -13,10 +13,7 @@ from flask import Flask, request, jsonify, Response
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Kolom yang ingin ditampilkan (None = semua kolom)
-TARGET_COLUMNS = [
-    'CILACAP', 'KROYA', 'CLP03A', 'ADIPALA',
-    'MERTASINGA', 'SALIWANGI', 'NUSAWUNGU'
-]
+TARGET_COLUMNS = None
 # TARGET_COLUMNS = None
 
 # Kolom & nilai yang digunakan untuk filter
