@@ -459,12 +459,12 @@ tbody td{
 </div>
 
 <div id="up-sec">
-  <div class="uz" id="dz">
+  <label class="uz" id="dz" for="fi">
     <span class="uico">📂</span>
     <h3>Unggah File Excel</h3>
-    <p class="sub">Drag &amp; Drop file .xlsx di sini, atau klik tombol di bawah</p>
-    <button class="btn-up" id="pickBtn">📎 Pilih File .xlsx</button>
-  </div>
+    <p class="sub">Drag &amp; Drop file .xlsx di sini, atau klik area ini / tombol di bawah</p>
+    <span class="btn-up" id="pickBtn">📎 Pilih File .xlsx</span>
+  </label>
   <input type="file" id="fi" accept=".xlsx" style="display:none">
 </div>
 
@@ -546,31 +546,29 @@ tbody td{
 (function(){
   var dz=document.getElementById('dz');
   var fileInput=document.getElementById('fi');
-  var pickBtn=document.getElementById('pickBtn');
   var dlBtn=document.getElementById('dlBtn');
 
   // ── DP cards lookup (dp_value → markdown content) ──
   var dpLookup = {};
 
-  pickBtn.addEventListener('click',function(e){
-    e.stopPropagation();
-    fileInput.value='';   // reset supaya file yang sama bisa di-upload ulang
-    fileInput.click();
-  });
-  dz.addEventListener('click',function(e){
-    // Jika klik dari pickBtn (sudah punya handler sendiri), abaikan
-    if(e.target===pickBtn||pickBtn.contains(e.target)) return;
-    fileInput.value='';
-    fileInput.click();
-  });
-  dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over');});
-  dz.addEventListener('dragleave',function(){dz.classList.remove('over');});
-  dz.addEventListener('drop',function(e){
-    e.preventDefault();dz.classList.remove('over');
-    if(e.dataTransfer.files[0])handle(e.dataTransfer.files[0]);
-  });
+  // ── File input: reset value agar file yang sama bisa di-upload ulang ──
   fileInput.addEventListener('change',function(){
-    if(fileInput.files[0])handle(fileInput.files[0]);
+    if(fileInput.files[0]) handle(fileInput.files[0]);
+    // Reset setelah handle dipanggil agar file yang sama bisa dipilih lagi
+    setTimeout(function(){ fileInput.value=''; }, 500);
+  });
+
+  // ── Drag & Drop ──
+  dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over');});
+  dz.addEventListener('dragleave',function(e){
+    // Hanya hapus 'over' jika keluar dari dz sepenuhnya
+    if(!dz.contains(e.relatedTarget)) dz.classList.remove('over');
+  });
+  dz.addEventListener('drop',function(e){
+    e.preventDefault();
+    dz.classList.remove('over');
+    var file = e.dataTransfer.files[0];
+    if(file) handle(file);
   });
   dlBtn.addEventListener('click',function(){window.location.href='/api/download';});
 
