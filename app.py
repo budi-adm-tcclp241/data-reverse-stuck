@@ -5,8 +5,10 @@ Deploy ke Railway / GitHub Codespaces:
   2. python app.py
 """
 
-import io, os, traceback
+import io, os, traceback, threading
 from flask import Flask, request, jsonify, Response
+from flask_cors import CORS
+import pandas as pd
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  ⚙️  KONFIGURASI — Edit sesuai kebutuhan Anda
@@ -666,7 +668,17 @@ tbody td{
     var fd=new FormData();
     fd.append('file',file);
     fetch('/api/upload',{method:'POST',body:fd})
-      .then(function(r){return r.json();})
+      .then(function(r){
+        if(!r.ok){
+          return r.text().then(function(t){
+            var msg='';
+            try{ var j=JSON.parse(t); msg=j.error||t.slice(0,300); }
+            catch(ex){ msg='HTTP '+r.status+' — '+t.slice(0,200); }
+            throw new Error(msg);
+          });
+        }
+        return r.json();
+      })
       .then(function(d){
         document.getElementById('ld').style.display='none';
         document.getElementById('up-sec').style.opacity='1';
@@ -881,24 +893,42 @@ tbody td{
 #  Flask App
 # ─────────────────────────────────────────────────────────────────────────────
 
-try:
-    from flask import Flask, request, jsonify, Response
-    from flask_cors import CORS
-    import pandas as pd
-except ImportError as e:
-    print(f"[ERROR] Dependency missing: {e}")
-    print("Install dulu: pip install flask flask-cors pandas openpyxl")
-    raise
-
 app = Flask(__name__)
 CORS(app)
 
+# ─── Batas ukuran file upload: 50 MB ────────────────────────────────────────
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
+
+# ─── In-memory store + lock untuk thread-safety ─────────────────────────────
+_store_lock = threading.Lock()
 store = {
     'df_raw' : None,
     'df_proc': None,
     'info'   : {},
     'csv'    : None,
 }
+
+
+# ─── JSON error handlers (agar fetch() selalu terima JSON, bukan HTML) ───────
+@app.errorhandler(413)
+def request_entity_too_large(e):
+    return jsonify({'error': 'File terlalu besar. Maksimum 50 MB.'}), 413
+
+@app.errorhandler(400)
+def bad_request(e):
+    return jsonify({'error': f'Bad request: {e.description}'}), 400
+
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({'error': 'Endpoint tidak ditemukan'}), 404
+
+@app.errorhandler(405)
+def method_not_allowed(e):
+    return jsonify({'error': 'Method tidak diizinkan'}), 405
+
+@app.errorhandler(500)
+def internal_error(e):
+    return jsonify({'error': f'Internal server error: {e}'}), 500
 
 
 def find_col(df, name):
@@ -921,14 +951,19 @@ def upload():
         return jsonify({'error': 'Tidak ada file yang diunggah'}), 400
 
     f = request.files['file']
+    if not f or not f.filename:
+        return jsonify({'error': 'File tidak valid atau nama file kosong'}), 400
     if not f.filename.lower().endswith('.xlsx'):
         return jsonify({'error': 'Hanya file .xlsx yang didukung!'}), 400
 
     try:
-        import io
         raw = f.read()
+        if not raw:
+            return jsonify({'error': 'File kosong, tidak dapat dibaca'}), 400
+
         df  = pd.read_excel(io.BytesIO(raw), engine='openpyxl')
-        store['df_raw'] = df
+        with _store_lock:
+            store['df_raw'] = df
 
         info = {
             'filename'  : f.filename,
@@ -940,7 +975,8 @@ def upload():
             'columns'   : list(df.columns),
             'memory_mb' : round(df.memory_usage(deep=True).sum() / 1_048_576, 3),
         }
-        store['info'] = info
+        with _store_lock:
+            store['info'] = info
         log = []
         res = df.copy()
 
@@ -995,13 +1031,11 @@ def upload():
                 'status': 'warning',
             })
 
-        store['df_proc'] = res
-
-        # Generate CSV
-        import io as _io
-        buf = _io.StringIO()
+        buf = io.StringIO()
         res.to_csv(buf, index=False)
-        store['csv'] = buf.getvalue()
+        with _store_lock:
+            store['df_proc'] = res
+            store['csv'] = buf.getvalue()
 
         pv = res.fillna('')
         return jsonify({
@@ -1021,10 +1055,12 @@ def upload():
 
 @app.route('/api/download')
 def download():
-    if not store['csv']:
+    with _store_lock:
+        csv_data = store['csv']
+    if not csv_data:
         return jsonify({'error': 'Belum ada data yang diproses'}), 400
     return Response(
-        store['csv'].encode('utf-8'),
+        csv_data.encode('utf-8'),
         mimetype='text/csv; charset=utf-8',
         headers={'Content-Disposition': f'attachment; filename={OUTPUT_FILENAME}'},
     )
@@ -1032,7 +1068,8 @@ def download():
 
 @app.route('/api/textboxdata')
 def textboxdata():
-    df = store['df_proc']
+    with _store_lock:
+        df = store['df_proc']
     if df is None:
         return jsonify({'error': 'Belum ada data'}), 400
 
@@ -1107,7 +1144,8 @@ def textboxdata():
 
 @app.route('/api/pivot')
 def pivot():
-    df = store['df_proc']
+    with _store_lock:
+        df = store['df_proc']
     if df is None:
         return jsonify({'error': 'Belum ada data'}), 400
 
