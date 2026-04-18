@@ -379,7 +379,7 @@ tbody td{
   <div class="hdr-badge">📊 Excel Explorer</div>
   <h1>Filter & Analisis Excel</h1>
   <p>Upload file .xlsx → Filter otomatis → Export ke CSV</p>
-  <p>18/04/2026 14:42</p>
+  <p>18/04/2026 15:21</p>
 </div>
 
 <div class="notice">
@@ -929,7 +929,8 @@ def textboxdata():
     cards = []
     for dp_val in df[col_dp].dropna().unique():
         df_dp = df[df[col_dp] == dp_val]
-        lines = [str(dp_val), '']
+        # Header DP pakai bold DingTalk (__teks__)
+        lines = [f'__{str(dp_val)}__']
         has_content = False
 
         for sumber_val in VALID_SUMBER:
@@ -938,7 +939,7 @@ def textboxdata():
             df_s = df_dp[df_dp[col_sumber].astype(str).str.strip().str.upper() == sumber_val]
             if df_s.empty:
                 continue
-            slines = [sumber_val, '']
+            slines = []
             slines_ok = False
 
             for status_val in VALID_STATUS:
@@ -947,21 +948,32 @@ def textboxdata():
                 df_st = df_s[df_s[col_status].astype(str).str.strip().str.upper() == status_val]
                 if df_st.empty:
                     continue
-                slines.append(status_val)
+
+                # Tambah header sumber (bold) hanya sekali per sumber
+                if not slines:
+                    slines.append('')
+                    slines.append(f'__{sumber_val}__')
+
+                # Header status (bold)
+                slines.append('')
+                slines.append(f'__{status_val}__')
+
                 top = custom[status_val]['top']
                 if top:
                     slines.append(top)
+
                 for _, row in df_st.iterrows():
                     awb = str(row[col_awb]).strip() if col_awb and col_awb in row.index else ''
                     if status_val == 'DISPATCH' and col_sprinter and col_sprinter in row.index:
                         sp = str(row[col_sprinter]).strip()
-                        slines.append(f'{awb} [{sp}]')
+                        slines.append(f'* {awb} [{sp}]')
                     else:
-                        slines.append(awb)
+                        slines.append(f'* {awb}')
+
                 bot = custom[status_val]['bottom']
                 if bot:
                     slines.append(bot)
-                slines.append('')
+
                 slines_ok = True
 
             if slines_ok:
