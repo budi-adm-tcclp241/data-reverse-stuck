@@ -374,6 +374,7 @@ tbody td{
   <div class="hdr-badge">📊 Excel Explorer</div>
   <h1>Filter & Analisis Excel</h1>
   <p>Upload file .xlsx → Filter otomatis → Export ke CSV</p>
+  <p>18/04/2026 09:43</p>
 </div>
 
 <div class="notice">
