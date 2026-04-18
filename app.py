@@ -335,17 +335,24 @@ tbody td{
 
 /* ── Pivot Table ── */
 .pv-wrap{overflow-x:auto;margin-top:6px}
-.pv-tbl{border-collapse:collapse;font-size:.85rem;min-width:420px;width:100%}
+.pv-tbl{border-collapse:collapse;font-size:.85rem;min-width:560px;width:100%}
 .pv-tbl th,.pv-tbl td{border:1px solid var(--border);padding:9px 16px;white-space:nowrap}
 .pv-tbl thead th{
   background:linear-gradient(135deg,var(--surface2),#eef2ff);
   color:var(--tx2);font-weight:700;text-align:center;
 }
 .pv-tbl thead th:first-child{text-align:left}
-.pv-tbl tbody td:first-child{font-weight:600;color:var(--tx)}
+.pv-tbl thead th.grp-hdr{
+  background:linear-gradient(135deg,#ede9fe,#e0d9fb);
+  color:var(--ac);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;
+  border-bottom:2px solid rgba(79,70,229,.25);
+}
+.pv-tbl thead th.sub-hdr{font-size:.78rem;color:var(--tx2)}
+.pv-tbl tbody td:first-child{font-weight:600;color:var(--tx);text-align:left}
 .pv-tbl tbody td{text-align:center;color:var(--tx2)}
 .pv-tbl tbody td.num{color:var(--ac);font-weight:700}
-.pv-tbl tbody td.empty{color:transparent;user-select:none}
+.pv-tbl tbody td.muted{color:var(--mu);font-weight:400;font-size:.8rem}
+.pv-tbl .sep-r{border-right:2.5px solid var(--border2) !important}
 .pv-tbl tbody tr:hover td{background:var(--ac-lter)}
 .pv-tbl tfoot td{
   background:linear-gradient(135deg,#ede9fe,#ddd6fe);
@@ -354,6 +361,7 @@ tbody td{
 }
 .pv-tbl tfoot td:first-child{text-align:left}
 .pv-tbl tfoot td.num{color:var(--ac)}
+.pv-tbl tfoot td.muted{color:var(--mu);font-weight:500}
 
 /* ── Responsive ── */
 @media(max-width:600px){
@@ -578,30 +586,78 @@ tbody td{
   function renderPivot(d){
     var sec=document.getElementById('pv-sec');
     var tbl=document.getElementById('pv-tbl');
-    var cols=d.status_cols;
-    var th='<thead><tr>'
-      +'<th>'+esc(d.col_dp)+'</th>'
-      +cols.map(function(c){return '<th>'+esc(c)+'</th>';}).join('')
-      +'<th>Grand Total</th>'
-      +'</tr></thead>';
+    var sbs=d.sumber_cols;   // ['TTREVERSE','TOKOREVERSE']
+    var sts=d.status_cols;   // ['DISPATCH','PUSAT_DISPATCH']
+    var lastSb=sbs[sbs.length-1];
+
+    // ── Header Row 1: grup Sumber Order ──
+    var hdr1='<tr>'
+      +'<th rowspan="2" style="vertical-align:bottom">'+esc(d.col_dp)+'</th>'
+      +sbs.map(function(sb,i){
+          var cls='grp-hdr'+(i<sbs.length-1?' sep-r':'');
+          return '<th colspan="'+sts.length+'" class="'+cls+'">'+esc(sb)+'</th>';
+        }).join('')
+      +'<th rowspan="2" style="vertical-align:bottom">Grand Total</th>'
+      +'</tr>';
+
+    // ── Header Row 2: sub-kolom Status ──
+    var hdr2='<tr>'
+      +sbs.map(function(sb,i){
+          return sts.map(function(st,j){
+            var isLast=(j===sts.length-1);
+            var cls='sub-hdr'+(isLast&&i<sbs.length-1?' sep-r':'');
+            return '<th class="'+cls+'">'+esc(st)+'</th>';
+          }).join('');
+        }).join('')
+      +'</tr>';
+
+    var th='<thead>'+hdr1+hdr2+'</thead>';
+
+    // ── Body ──
+    function cellVal(v){
+      return (v===0||v===''||v===null)
+        ? '<td class="muted">-</td>'
+        : '<td class="num">'+Number(v).toLocaleString('id-ID')+'</td>';
+    }
+    function cellValSep(v){
+      return (v===0||v===''||v===null)
+        ? '<td class="muted sep-r">-</td>'
+        : '<td class="num sep-r">'+Number(v).toLocaleString('id-ID')+'</td>';
+    }
+
     var tb='<tbody>'+d.rows.map(function(row){
-      var cells=cols.map(function(c){
-        var v=row[c];
-        return v===''
-          ?'<td class="empty">-</td>'
-          :'<td class="num">'+v+'</td>';
+      var cells=sbs.map(function(sb,i){
+        var grp=row[sb]||{};
+        var isSepGrp=(i<sbs.length-1);
+        return sts.map(function(st,j){
+          var v=grp[st]||0;
+          var isLastSt=(j===sts.length-1);
+          return (isLastSt&&isSepGrp)?cellValSep(v):cellVal(v);
+        }).join('');
       }).join('');
-      var gt=row['Grand Total'];
-      return '<tr><td>'+esc(row.dp)+'</td>'+cells+'<td class="num">'+gt+'</td></tr>';
+      var gt=row.grand_total;
+      return '<tr><td>'+esc(row.dp)+'</td>'+cells
+        +'<td class="num">'+Number(gt).toLocaleString('id-ID')+'</td></tr>';
     }).join('')+'</tbody>';
+
+    // ── Footer grand total ──
     var g=d.grand;
     var gf='<tfoot><tr><td>Grand Total</td>'
-      +cols.map(function(c){
-        var v=g[c];
-        return v===''?'<td></td>':'<td class="num">'+v+'</td>';
-      }).join('')
-      +'<td class="num">'+g['Grand Total']+'</td>'
+      +sbs.map(function(sb,i){
+          var grp=g[sb]||{};
+          var isSepGrp=(i<sbs.length-1);
+          return sts.map(function(st,j){
+            var v=grp[st]||0;
+            var isLastSt=(j===sts.length-1);
+            var sepCls=(isLastSt&&isSepGrp)?' sep-r':'';
+            return (v===0)
+              ?'<td class="muted'+sepCls+'">-</td>'
+              :'<td class="num'+sepCls+'">'+Number(v).toLocaleString('id-ID')+'</td>';
+          }).join('');
+        }).join('')
+      +'<td class="num">'+Number(g.grand_total).toLocaleString('id-ID')+'</td>'
       +'</tr></tfoot>';
+
     tbl.innerHTML=th+tb+gf;
     sec.style.display='block';
   }
@@ -896,59 +952,68 @@ def pivot():
 
     col_dp     = find_col(df, 'DP Terjadwal')
     col_status = find_col(df, 'Status Orderan')
+    col_sumber = find_col(df, 'Sumber Order')
 
     if not col_dp:
         return jsonify({'error': "Kolom 'DP Terjadwal' tidak ditemukan"}), 400
     if not col_status:
         return jsonify({'error': "Kolom 'Status Orderan' tidak ditemukan"}), 400
 
+    SUMBER_COLS = ['TTREVERSE', 'TOKOREVERSE']
     STATUS_COLS = ['DISPATCH', 'PUSAT_DISPATCH']
 
-    df_work = df[[col_dp, col_status]].copy()
+    # Normalisasi kolom bantu
+    df_work = df.copy()
+    df_work['_dp'] = df_work[col_dp]
     df_work['_st'] = df_work[col_status].astype(str).str.strip().str.upper()
-    df_filt = df_work[df_work['_st'].isin(STATUS_COLS)]
-
-    if df_filt.empty:
-        pt = {dp: {s: 0 for s in STATUS_COLS} for dp in df[col_dp].dropna().unique()}
+    if col_sumber:
+        df_work['_sb'] = df_work[col_sumber].astype(str).str.strip().str.upper()
     else:
-        grp = df_filt.groupby([col_dp, '_st']).size().unstack(fill_value=0)
-        for s in STATUS_COLS:
-            if s not in grp.columns:
-                grp[s] = 0
-        grp = grp[STATUS_COLS]
-        pt = grp.to_dict(orient='index')
+        df_work['_sb'] = ''
+
+    df_filt = df_work[
+        df_work['_st'].isin(STATUS_COLS) &
+        df_work['_sb'].isin(SUMBER_COLS)
+    ]
+
+    # Build lookup: {dp: {sumber: {status: count}}}
+    lookup = {}
+    if not df_filt.empty:
+        for (dp_val, sb_val, st_val), grp in df_filt.groupby(['_dp', '_sb', '_st']):
+            lookup.setdefault(dp_val, {}).setdefault(sb_val, {})[st_val] = len(grp)
 
     all_dp = list(df[col_dp].dropna().unique())
     ordered = [v for v in FILTER_VALUES if v in all_dp] + \
               sorted([v for v in all_dp if v not in FILTER_VALUES])
 
     rows = []
-    grand = {s: 0 for s in STATUS_COLS}
-    grand['Grand Total'] = 0
+    grand_sb = {sb: {st: 0 for st in STATUS_COLS} for sb in SUMBER_COLS}
+    grand_total = 0
 
     for dp_val in ordered:
-        counts = pt.get(dp_val, {s: 0 for s in STATUS_COLS})
         row = {'dp': str(dp_val)}
-        total = 0
-        for s in STATUS_COLS:
-            v = int(counts.get(s, 0))
-            row[s] = v if v > 0 else ''
-            grand[s] = grand.get(s, 0) + v
-            total += v
-        row['Grand Total'] = total
-        grand['Grand Total'] += total
+        row_total = 0
+        dp_data = lookup.get(dp_val, {})
+        for sb in SUMBER_COLS:
+            sb_data = dp_data.get(sb, {})
+            row[sb] = {}
+            for st in STATUS_COLS:
+                v = int(sb_data.get(st, 0))
+                row[sb][st] = v
+                grand_sb[sb][st] += v
+                row_total += v
+        row['grand_total'] = row_total
+        grand_total += row_total
         rows.append(row)
 
-    grand_clean = {'dp': 'Grand Total'}
-    for s in STATUS_COLS:
-        grand_clean[s] = grand[s] if grand[s] > 0 else ''
-    grand_clean['Grand Total'] = grand['Grand Total']
+    grand = {sb: {st: grand_sb[sb][st] for st in STATUS_COLS} for sb in SUMBER_COLS}
 
     return jsonify({
         'col_dp'     : col_dp,
+        'sumber_cols': SUMBER_COLS,
         'status_cols': STATUS_COLS,
         'rows'       : rows,
-        'grand'      : grand_clean,
+        'grand'      : {**grand, 'grand_total': grand_total},
     })
 
 
